@@ -1,3 +1,4 @@
+using CodeBase.Infrastructure.Service.InputService;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -93,6 +94,7 @@ namespace Ashsvp
         public float[] forwardSlip = new float[4], slipCoeff = new float[4], skidTotal = new float[4];
         private WheelSkid[] wheelSkids = new WheelSkid[4];
 
+        private IInputService _inputService;
 
         void Awake()
         {
@@ -119,8 +121,14 @@ namespace Ashsvp
             rearTrack = Vector3.Distance(Wheels[0].position, Wheels[1].position);
 
             GearSystem = GetComponent<GearSystem>();
+
+            InitInputService();
         }
 
+        private void InitInputService()
+        {
+            _inputService = new InputSystemService();
+        }
 
         private void Start()
         {
@@ -133,15 +141,15 @@ namespace Ashsvp
         {
             if (CanDrive && CanAccelerate)
             {
-                accelerationInput = Input.GetAxis("Vertical");
-                steerInput = Input.GetAxis("Horizontal");
-                brakeInput = Input.GetAxis("Jump");
+                accelerationInput = _inputService.Axis.y;
+                steerInput = _inputService.Axis.x;
+                brakeInput = _inputService.Braking;
             }
             else if(CanDrive && !CanAccelerate)
             {
                 accelerationInput = 0;
-                steerInput = Input.GetAxis("Horizontal");
-                brakeInput = Input.GetAxis("Jump");
+                steerInput = _inputService.Axis.x;
+                brakeInput = _inputService.Braking;
             }
             else
             {
