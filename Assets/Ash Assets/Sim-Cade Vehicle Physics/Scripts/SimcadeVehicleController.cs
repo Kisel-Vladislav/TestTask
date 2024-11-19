@@ -1,9 +1,8 @@
 using CodeBase.Infrastructure.Service.InputService;
 using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
+using Zenject;
 
 namespace Ashsvp
 {
@@ -96,6 +95,12 @@ namespace Ashsvp
 
         private IInputService _inputService;
 
+        [Inject]
+        private void Construct(IInputService inputService)
+        {
+            _inputService = inputService;
+        }
+
         void Awake()
         {
             GameObject SkidMarkController_Self = Instantiate(SkidMarkController);
@@ -122,12 +127,6 @@ namespace Ashsvp
 
             GearSystem = GetComponent<GearSystem>();
 
-            InitInputService();
-        }
-
-        private void InitInputService()
-        {
-            _inputService = new InputSystemService();
         }
 
         private void Start()
@@ -243,6 +242,23 @@ namespace Ashsvp
                 GroundedProperty = vehicleIsGrounded;
             }
 
+        }
+        public void ResetVehiclePosition(Transform resetPosition)
+        {
+            rb.velocity = Vector3.zero;
+            rb.angularVelocity = Vector3.zero;
+
+            transform.position = resetPosition.position;
+            transform.rotation = resetPosition.rotation;
+
+            localVehicleVelocity = Vector3.zero;
+            lastVelocity = Vector3.zero;
+
+            accelerationInput = 0;
+            steerInput = 0;
+            brakeInput = 0;
+
+            rb.centerOfMass = CentreOfMass_ground;
         }
 
         void AddAcceleration(float accelerationInput)
